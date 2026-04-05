@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import UploadFile
 
 from app.models.schemas import BulkUploadResponse, ResumeUploadResult
+from app.services.candidate_profile_service import build_candidate_profile
 from app.services.text_extraction_service import extract_text_from_file
 from app.utils.file_handler import save_upload_file
 
@@ -21,6 +22,10 @@ async def handle_bulk_resume_upload(files: list[UploadFile]) -> BulkUploadRespon
         saved_filename = ""
         preview_text = ""
         extraction_status = "failed"
+        name = ""
+        skills: list[str] = []
+        experience_years: int | float = 0
+        projects: list[str] = []
 
         try:
             saved_filename, _ = await save_upload_file(upload_dir=UPLOAD_DIR, upload_file=file)
@@ -32,6 +37,19 @@ async def handle_bulk_resume_upload(files: list[UploadFile]) -> BulkUploadRespon
             if len(extracted_text) > 0:
                 extraction_status = "success"
                 successful_extractions += 1
+
+            try:
+                profile_data = build_candidate_profile(extracted_text)
+                name = str(profile_data.get("name", ""))
+                skills = list(profile_data.get("skills", []))
+                experience_years = profile_data.get("experience_years", 0)
+                projects = list(profile_data.get("projects", []))
+            except Exception:
+                # Keep default profile values if profile extraction fails.
+                name = ""
+                skills = []
+                experience_years = 0
+                projects = []
         except Exception:
             # Continue processing remaining files even if one file fails.
             extraction_status = "failed"
@@ -43,6 +61,10 @@ async def handle_bulk_resume_upload(files: list[UploadFile]) -> BulkUploadRespon
                 file_type=file_type,
                 extraction_status=extraction_status,
                 preview_text=preview_text,
+                name=name,
+                skills=skills,
+                experience_years=experience_years,
+                projects=projects,
             )
         )
 

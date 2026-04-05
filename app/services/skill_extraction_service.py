@@ -1,5 +1,7 @@
 import re
 
+from app.utils.text_cleaner import clean_resume_text
+
 
 COMMON_SKILLS = [
     "Python",
@@ -51,8 +53,9 @@ def extract_skills(text: str) -> list[str]:
     if not text or not text.strip():
         return []
 
-    # Normalize spacing and case for predictable matching.
-    normalized_text = re.sub(r"\s+", " ", text).strip().lower()
+    normalized_text = clean_resume_text(text)
+    if not normalized_text:
+        return []
 
     detected_skills: list[str] = []
 

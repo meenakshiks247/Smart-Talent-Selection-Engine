@@ -1,5 +1,7 @@
 import re
 
+from app.utils.text_cleaner import clean_resume_text
+
 
 EXPERIENCE_PATTERN = re.compile(
     r"(?:over\s*)?(\d+(?:\.\d+)?)\s*\+?\s*years?",
@@ -21,7 +23,11 @@ def extract_experience(text: str) -> int | float:
     if not text or not text.strip():
         return 0
 
-    matches = EXPERIENCE_PATTERN.findall(text)
+    cleaned_text = clean_resume_text(text)
+    if not cleaned_text:
+        return 0
+
+    matches = EXPERIENCE_PATTERN.findall(cleaned_text)
 
     if not matches:
         return 0
