@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 import re
 from typing import Any
@@ -9,6 +10,9 @@ import openai
 
 from app.services.semantic_matching_service import calculate_similarity
 from app.services.skill_extraction_service import extract_skills
+
+
+logger = logging.getLogger(__name__)
 
 
 SEMANTIC_WEIGHT = 0.6
@@ -42,7 +46,11 @@ async def rank_candidates(candidates: list[dict[str, Any]], jd_text: str) -> lis
 
         semantic_similarity = 0.0
         if extracted_text and normalized_jd_text:
-            semantic_similarity = calculate_similarity(extracted_text, normalized_jd_text)
+            semantic_similarity = calculate_similarity(
+                extracted_text,
+                normalized_jd_text,
+                candidate_name=name,
+            )
 
         skill_match_score, matched_skills = _calculate_skill_match_score(skills, jd_skills)
         experience_score = _calculate_experience_score(experience_years)
@@ -53,6 +61,12 @@ async def rank_candidates(candidates: list[dict[str, Any]], jd_text: str) -> lis
             + skill_match_score * SKILL_WEIGHT
             + experience_score * EXPERIENCE_WEIGHT
         )
+        bounded_score = round(max(0.0, min(100.0, final_score)), 2)
+        logger.info(
+            "Final weighted score for candidate '%s': %.2f",
+            name or "unknown",
+            bounded_score,
+        )
 
         ranked_candidates.append(
             {
@@ -62,7 +76,7 @@ async def rank_candidates(candidates: list[dict[str, Any]], jd_text: str) -> lis
                 "projects": projects,
                 "extracted_text": extracted_text,
                 "fit_summary": fit_summary,
-                "score": round(max(0.0, min(100.0, final_score)), 2),
+                "score": bounded_score,
                 "score_breakdown": {
                     "semantic_similarity": round(semantic_similarity, 2),
                     "skill_match_score": round(skill_match_score, 2),

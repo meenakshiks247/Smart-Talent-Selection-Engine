@@ -25,13 +25,14 @@ def _load_model():
         from sentence_transformers import SentenceTransformer
 
         _MODEL = SentenceTransformer(MODEL_NAME)
+        logger.info("Semantic embedding model loaded: %s", MODEL_NAME)
         return _MODEL
     except Exception:
         logger.error("Failed to load semantic embedding model '%s'.", MODEL_NAME, exc_info=True)
         return None
 
 
-def get_embedding(text: str) -> list[float]:
+def get_embedding(text: str, candidate_name: str | None = None) -> list[float]:
     """Return an embedding vector for a single text input.
 
     Returns an empty list if the model cannot be loaded or encoding fails.
@@ -45,13 +46,17 @@ def get_embedding(text: str) -> list[float]:
 
     try:
         embedding = model.encode(text, convert_to_numpy=True)
+        logger.info(
+            "Generated embedding for candidate '%s'.",
+            (candidate_name or "unknown").strip() or "unknown",
+        )
         return embedding.tolist()
     except Exception:
         logger.error("Failed to generate embedding for input text.", exc_info=True)
         return []
 
 
-def get_embeddings(texts: list[str]) -> list[list[float]]:
+def get_embeddings(texts: list[str], candidate_name: str | None = None) -> list[list[float]]:
     """Return embeddings for a batch of text inputs.
 
     Returns an empty list if the model cannot be loaded or encoding fails.
@@ -67,6 +72,11 @@ def get_embeddings(texts: list[str]) -> list[list[float]]:
 
     try:
         embeddings = model.encode(normalized_texts, convert_to_numpy=True)
+        logger.info(
+            "Generated %d embeddings for candidate '%s'.",
+            len(normalized_texts),
+            (candidate_name or "batch").strip() or "batch",
+        )
         return embeddings.tolist()
     except Exception:
         logger.error("Failed to generate embeddings for batch input.", exc_info=True)
