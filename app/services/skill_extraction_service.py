@@ -63,14 +63,14 @@ def extract_skills(text: str) -> list[str]:
         aliases = SKILL_SYNONYMS.get(skill, [skill.lower()])
 
         for alias in aliases:
-            if _contains_term(normalized_text, alias):
+            if _contains_term(normalized_text, skill, alias):
                 detected_skills.append(skill)
                 break
 
     return detected_skills
 
 
-def _contains_term(normalized_text: str, term: str) -> bool:
+def _contains_term(normalized_text: str, skill: str, term: str) -> bool:
     escaped_term = re.escape(term.lower())
-    pattern = rf"(?<![a-z0-9]){escaped_term}(?![a-z0-9])"
+    pattern = rf"(?<!\w){escaped_term}(?!\w)"
     return re.search(pattern, normalized_text) is not None

@@ -28,3 +28,15 @@ def test_extract_skills_does_not_match_partial_words() -> None:
     text = "We use javascript heavily"
 
     assert extract_skills(text) == ["JavaScript"]
+
+
+def test_extract_skills_does_not_detect_javascript_from_node_js_only() -> None:
+    text = "Experienced with Node.js and backend APIs"
+
+    assert extract_skills(text) == ["Node.js"]
+
+
+def test_extract_skills_does_not_match_javascript_substrings() -> None:
+    text = "Worked primarily with Node.js for backend services"
+
+    assert "JavaScript" not in extract_skills(text)
