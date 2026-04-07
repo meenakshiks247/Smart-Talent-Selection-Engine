@@ -1,3 +1,4 @@
+import asyncio
 import json
 import sys
 from pathlib import Path
@@ -51,7 +52,7 @@ def main() -> None:
         },
     ]
 
-    ranked_candidates = rank_candidates(candidates, jd_text)
+    ranked_candidates = asyncio.run(rank_candidates(candidates, jd_text))
 
     print("Ranked Candidates")
     print(json.dumps(ranked_candidates, indent=2))

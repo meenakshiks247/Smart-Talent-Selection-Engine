@@ -39,7 +39,7 @@ async def rank_candidates_endpoint(payload: RankCandidatesRequest) -> RankCandid
             )
 
     try:
-        ranked_candidates = rank_candidates(valid_candidates, payload.jd_text)
+        ranked_candidates = await rank_candidates(valid_candidates, payload.jd_text)
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

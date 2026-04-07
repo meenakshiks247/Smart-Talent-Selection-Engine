@@ -1,3 +1,5 @@
+# requirements: pytesseract, Pillow
+
 import importlib
 import re
 from pathlib import Path
@@ -6,7 +8,6 @@ from pathlib import Path
 PDF_EXTENSIONS = {".pdf"}
 DOCX_EXTENSIONS = {".docx"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
-TEXT_EXTENSIONS = {".txt"}
 
 
 def extract_text_from_file(file_path: str | Path) -> str:
@@ -16,9 +17,9 @@ def extract_text_from_file(file_path: str | Path) -> str:
     - PDF via pdfplumber
     - DOCX via python-docx
     - JPG/JPEG/PNG via pytesseract + Pillow
-    - TXT via plain text read
 
-    Returns an empty string when extraction fails or file type is unsupported.
+    Raises:
+    - ValueError for unsupported file types
     """
     path = Path(file_path)
 
@@ -27,18 +28,17 @@ def extract_text_from_file(file_path: str | Path) -> str:
 
     extension = path.suffix.lower()
 
-    try:
-        if extension in PDF_EXTENSIONS:
-            extracted_text = _extract_from_pdf(path)
-        elif extension in DOCX_EXTENSIONS:
-            extracted_text = _extract_from_docx(path)
-        elif extension in IMAGE_EXTENSIONS:
-            extracted_text = _extract_from_image(path)
-        elif extension in TEXT_EXTENSIONS:
-            extracted_text = _extract_from_txt(path)
-        else:
-            return ""
+    if extension in PDF_EXTENSIONS:
+        extractor = _extract_from_pdf
+    elif extension in DOCX_EXTENSIONS:
+        extractor = _extract_from_docx
+    elif extension in IMAGE_EXTENSIONS:
+        extractor = _extract_from_image
+    else:
+        raise ValueError(f"Unsupported file format: {extension or 'unknown'}")
 
+    try:
+        extracted_text = extractor(path)
         return _clean_text(extracted_text)
     except Exception:
         return ""
@@ -70,10 +70,6 @@ def _extract_from_image(path: Path) -> str:
 
     with pil_image_module.open(path) as image:
         return pytesseract.image_to_string(image)
-
-
-def _extract_from_txt(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="ignore")
 
 
 def _clean_text(text: str) -> str:

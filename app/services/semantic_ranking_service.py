@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import asyncio
+import os
+import re
 from typing import Any
+
+import openai
 
 from app.services.semantic_matching_service import calculate_similarity
 from app.services.skill_extraction_service import extract_skills
@@ -11,10 +16,18 @@ SKILL_WEIGHT = 0.25
 EXPERIENCE_WEIGHT = 0.15
 
 
-def rank_candidates(candidates: list[dict[str, Any]], jd_text: str) -> list[dict[str, Any]]:
+async def rank_candidates(candidates: list[dict[str, Any]], jd_text: str) -> list[dict[str, Any]]:
     """Rank candidates against a job description and return score breakdowns."""
     normalized_jd_text = jd_text.strip() if isinstance(jd_text, str) else ""
     jd_skills = _normalize_skills(extract_skills(normalized_jd_text)) if normalized_jd_text else []
+    api_key = os.getenv("OPENAI_API_KEY")
+    client = None
+
+    if api_key:
+        try:
+            client = openai.OpenAI(api_key=api_key)
+        except Exception:
+            client = None
 
     ranked_candidates: list[dict[str, Any]] = []
 
@@ -65,7 +78,49 @@ def rank_candidates(candidates: list[dict[str, Any]], jd_text: str) -> list[dict
             }
         )
 
-    return sorted(ranked_candidates, key=lambda item: item["score"], reverse=True)
+    ranked_candidates = sorted(ranked_candidates, key=lambda item: item["score"], reverse=True)
+
+    for rank, candidate in enumerate(ranked_candidates, start=1):
+        if rank > 5 or client is None:
+            continue
+
+        fallback_summary = candidate["fit_summary"]
+        candidate_prompt = _build_llm_summary_prompt(
+            candidate_name=candidate["name"],
+            skills=candidate["skills"],
+            experience_years=candidate["experience_years"],
+            jd_text=normalized_jd_text,
+        )
+
+        try:
+            response = await asyncio.to_thread(
+                client.chat.completions.create,
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You write concise candidate fit summaries for recruiters.",
+                    },
+                    {
+                        "role": "user",
+                        "content": candidate_prompt,
+                    },
+                ],
+                temperature=0.3,
+                max_tokens=120,
+            )
+
+            summary = ""
+            if response.choices and response.choices[0].message and response.choices[0].message.content:
+                summary = response.choices[0].message.content.strip()
+
+            summary = _limit_to_two_sentences(summary)
+            if summary:
+                candidate["fit_summary"] = summary
+        except Exception:
+            candidate["fit_summary"] = fallback_summary
+
+    return ranked_candidates
 
 
 def _calculate_skill_match_score(candidate_skills: list[str], jd_skills: list[str]) -> tuple[float, list[str]]:
@@ -116,6 +171,32 @@ def _build_fit_summary(
         summary += "."
 
     return summary
+
+
+def _build_llm_summary_prompt(
+    candidate_name: str,
+    skills: list[str],
+    experience_years: int | float,
+    jd_text: str,
+) -> str:
+    top_skills = ", ".join(skills[:5]) if skills else "none listed"
+    experience_label = f"{experience_years:g} years" if isinstance(experience_years, (int, float)) else "unknown experience"
+
+    return (
+        f"Write exactly 2 sentences explaining why {candidate_name or 'this candidate'} fits the job description. "
+        f"Mention the candidate's top skills ({top_skills}), their experience ({experience_label}), and the job description below. "
+        f"Do not add bullet points or headings.\n\n"
+        f"Job description:\n{jd_text}"
+    )
+
+
+def _limit_to_two_sentences(text: str) -> str:
+    if not text:
+        return ""
+
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    summary = " ".join(sentence.strip() for sentence in sentences[:2] if sentence.strip())
+    return summary.strip()
 
 
 def _format_skill_phrase(matched_skills: list[str]) -> str:
