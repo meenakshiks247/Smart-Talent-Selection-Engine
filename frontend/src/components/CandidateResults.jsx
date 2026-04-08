@@ -1,9 +1,14 @@
-function CandidateResults({ candidates = [] }) {
+function CandidateResults({ candidates = [], status = 'idle', errorMessage = '', dataMode = 'live' }) {
   const sortedCandidates = [...candidates].sort((firstCandidate, secondCandidate) => {
     const firstScore = Number(firstCandidate?.score ?? 0)
     const secondScore = Number(secondCandidate?.score ?? 0)
     return secondScore - firstScore
   })
+
+  const isIdle = status === 'idle'
+  const isLoading = status === 'loading'
+  const isError = status === 'error'
+  const hasResults = sortedCandidates.length > 0
 
   function getScoreTone(score) {
     if (score >= 80) {
@@ -35,27 +40,70 @@ function CandidateResults({ candidates = [] }) {
     }
   }
 
-  if (sortedCandidates.length === 0) {
+  if (isLoading) {
     return (
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex items-start justify-between gap-4">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/60 sm:p-7">
+        <h2 className="text-lg font-semibold text-slate-900">Candidate Results</h2>
+        <p className="mt-1 text-sm text-slate-600">Analyzing resumes and job description match now.</p>
+
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Candidate Results</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Ranked candidates will appear here after the analysis step.
-            </p>
+            <p className="text-sm font-medium text-slate-900">Ranking candidates...</p>
+            <p className="text-sm text-slate-600">This may take a few seconds while the backend processes the files.</p>
           </div>
         </div>
+      </section>
+    )
+  }
 
-        <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
-          Upload resumes, add a job description, and run analysis to preview the ranked candidate cards.
+  if (isError) {
+    return (
+      <section className="rounded-2xl border border-rose-200 bg-white p-6 shadow-sm shadow-slate-200/60 sm:p-7">
+        <h2 className="text-lg font-semibold text-slate-900">Candidate Results</h2>
+        <div className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 shadow-sm">
+          <p className="font-semibold">Analysis could not be completed.</p>
+          <p className="mt-1">{errorMessage || 'Please try again in a moment.'}</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (isIdle) {
+    return (
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/60 sm:p-7">
+        <h2 className="text-lg font-semibold text-slate-900">Candidate Results</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Your ranked candidates will appear here after the first analysis run.
+        </p>
+
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm leading-6 text-slate-600 shadow-sm">
+          <p className="font-medium text-slate-800">To get started:</p>
+          <ul className="mt-2 space-y-1 pl-4">
+            <li>Upload one or more resume files.</li>
+            <li>Paste the job description you want to screen against.</li>
+            <li>Click Analyze Candidates to generate the ranking.</li>
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  if (!hasResults) {
+    return (
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/60 sm:p-7">
+        <h2 className="text-lg font-semibold text-slate-900">Candidate Results</h2>
+        <p className="mt-1 text-sm text-slate-600">The analysis finished, but no candidates were returned.</p>
+
+        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 shadow-sm">
+          Try uploading resumes with clearer extracted profile data or run the analysis again.
         </div>
       </section>
     )
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/60 sm:p-7">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Candidate Results</h2>
@@ -63,16 +111,25 @@ function CandidateResults({ candidates = [] }) {
             Candidates are sorted by score in descending order for quick review.
           </p>
         </div>
-        <p className="text-sm font-medium text-slate-500">{sortedCandidates.length} candidates</p>
+        <div className="flex items-center gap-2">
+          {dataMode === 'mock' ? (
+            <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-100">
+              Development preview data
+            </span>
+          ) : null}
+          <p className="text-sm font-medium text-slate-500">{sortedCandidates.length} candidates</p>
+        </div>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {sortedCandidates.map((candidate, index) => {
           const score = Number(candidate?.score ?? 0)
           const normalizedScore = Number.isNaN(score) ? 0 : Math.max(0, Math.min(score, 100))
           const scoreDisplay = `${Math.round(normalizedScore)}%`
           const scoreTone = getScoreTone(normalizedScore)
-          const skillMatch = candidate?.skill_match ?? candidate?.skillMatch ?? 'Not provided'
+          const skills = Array.isArray(candidate?.skills)
+            ? candidate.skills.join(', ')
+            : candidate?.skill_match ?? candidate?.skillMatch ?? 'Not provided'
           const experience = candidate?.experience ?? 'Not provided'
           const fitSummary = candidate?.fit_summary ?? candidate?.fitSummary ?? 'No summary available.'
 
@@ -90,7 +147,10 @@ function CandidateResults({ candidates = [] }) {
                       {candidate?.name ?? 'Unnamed Candidate'}
                     </h3>
                     {index === 0 ? (
-                      <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+                        <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
+                          <path d="M10 1.75l2.08 4.22 4.66.68-3.37 3.28.8 4.64L10 12.37 5.83 14.57l.8-4.64L3.26 6.65l4.66-.68L10 1.75z" />
+                        </svg>
                         Best Fit
                       </span>
                     ) : null}
@@ -122,8 +182,8 @@ function CandidateResults({ candidates = [] }) {
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl bg-white px-3 py-3 ring-1 ring-slate-200">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Skill Match</p>
-                  <p className="mt-1 text-sm font-medium text-slate-900">{skillMatch}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Skills</p>
+                  <p className="mt-1 text-sm font-medium text-slate-900">{skills}</p>
                 </div>
                 <div className="rounded-xl bg-white px-3 py-3 ring-1 ring-slate-200">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Experience</p>

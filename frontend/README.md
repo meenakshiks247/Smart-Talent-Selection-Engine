@@ -51,6 +51,14 @@ npm run dev
 
 Open the printed local URL (usually `http://localhost:5173`).
 
+## Mock Data Toggle
+
+For quick UI testing without the backend, set `VITE_USE_MOCK_DATA=true` in a local `.env` file.
+
+The included [.env.example](.env.example) shows the default development preview setting.
+
+Set `VITE_USE_MOCK_DATA=false` to use the live API flow.
+
 ## Build and Lint
 
 ```bash

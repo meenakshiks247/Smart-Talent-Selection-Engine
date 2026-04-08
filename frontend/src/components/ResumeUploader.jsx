@@ -10,9 +10,8 @@ const ACCEPTED_TYPES = [
 ]
 
 
-function ResumeUploader({ onFilesChange }) {
+function ResumeUploader({ files = [], onFilesChange }) {
   const inputRef = useRef(null)
-  const [files, setFiles] = useState([])
   const [validationMessage, setValidationMessage] = useState('')
   const [isDragging, setIsDragging] = useState(false)
 
@@ -54,8 +53,6 @@ function ResumeUploader({ onFilesChange }) {
       }
     })
 
-    setFiles(validFiles)
-
     if (invalidNames.length > 0) {
       setValidationMessage(`Unsupported file type: ${invalidNames.join(', ')}`)
     } else {
@@ -72,7 +69,6 @@ function ResumeUploader({ onFilesChange }) {
   }
 
   function handleClearFiles() {
-    setFiles([])
     setValidationMessage('')
 
     if (inputRef.current) {
