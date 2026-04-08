@@ -1,6 +1,18 @@
 import { formatScore } from '../utils/formatScore'
 
 function RankingResultsSection({ candidates }) {
+  if (!candidates.length) {
+    return (
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-medium text-slate-900">Candidate Ranking Results</h2>
+        <p className="mt-1 text-sm text-slate-600">Ranked output appears here after candidate analysis.</p>
+        <p className="mt-4 rounded-md bg-slate-50 p-4 text-sm text-slate-600">
+          Upload resumes and add a job description, then click Analyze Candidates to preview ranking results.
+        </p>
+      </section>
+    )
+  }
+
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-medium text-slate-900">Candidate Ranking Results</h2>
