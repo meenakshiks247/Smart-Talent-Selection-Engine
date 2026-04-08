@@ -1,16 +1,67 @@
-# React + Vite
+# Smart Talent Selection Engine Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Beginner-friendly React frontend built with Vite, functional components, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React (functional components only)
+- Vite
+- Tailwind CSS
+- ESLint
 
-## React Compiler
+## Folder Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```text
+frontend/
+	src/
+		components/
+			AppLayout.jsx
+			ResumeUploadSection.jsx
+			ResumeUploader.jsx
+			JobDescriptionSection.jsx
+			JobDescriptionInput.jsx
+			RankingResultsSection.jsx
+		pages/
+			DashboardPage.jsx
+		services/
+			apiClient.js
+		utils/
+			mockData.js
+			formatScore.js
+		App.jsx
+		main.jsx
+		index.css
+```
 
-## Expanding the ESLint configuration
+## Tailwind Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Tailwind is configured through:
+
+- `tailwindcss` and `@tailwindcss/postcss` packages
+- `postcss.config.js`
+- `tailwind.config.js`
+- `src/index.css` with `@import "tailwindcss";`
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open the printed local URL (usually `http://localhost:5173`).
+
+## Build and Lint
+
+```bash
+npm run build
+npm run lint
+```
+
+## Current Starter Flow
+
+1. Upload resume files in the upload section.
+2. Paste a job description in the input section.
+3. Click **Analyze Candidates** to preview starter ranking results.
+
+This is intentionally simple so backend API integration can be added in `src/services/apiClient.js` later.
