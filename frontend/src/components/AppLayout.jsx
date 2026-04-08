@@ -8,7 +8,7 @@ function AppLayout({ children }) {
               AI Resume Ranking System
             </h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-600 sm:text-base">
-              Rank candidates using semantic matching between resume profiles and your job description.
+              Rank candidates based on semantic matching with the job description.
             </p>
           </div>
         </div>
