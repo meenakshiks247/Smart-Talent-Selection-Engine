@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-
 function JobDescriptionInput({ initialValue = '', onValueChange }) {
   const [description, setDescription] = useState(initialValue)
 
@@ -14,7 +13,7 @@ function JobDescriptionInput({ initialValue = '', onValueChange }) {
   }
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 space-y-2">
       <label htmlFor="jobDescriptionInput" className="mb-2 block text-sm font-medium text-slate-700">
         Job Description
       </label>
@@ -24,9 +23,9 @@ function JobDescriptionInput({ initialValue = '', onValueChange }) {
         value={description}
         onChange={handleChange}
         placeholder="Paste the job description here..."
-        className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-700 shadow-sm focus:border-slate-500 focus:outline-none"
+        className="min-h-64 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-700 shadow-sm transition placeholder:text-slate-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
       />
-      <p className="mt-2 text-right text-xs text-slate-500">Character count: {description.length}</p>
+      <p className="text-right text-xs font-medium text-slate-500">Character count: {description.length}</p>
     </div>
   )
 }
