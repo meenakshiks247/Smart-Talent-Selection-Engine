@@ -14,16 +14,28 @@ function ResumeUploader({ onFilesChange }) {
   const inputRef = useRef(null)
   const [files, setFiles] = useState([])
   const [validationMessage, setValidationMessage] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
 
   function handleInputChange(event) {
     const selectedFiles = Array.from(event.target.files || [])
     processSelectedFiles(selectedFiles)
+    event.target.value = ''
   }
 
   function handleDrop(event) {
     event.preventDefault()
+    setIsDragging(false)
     const droppedFiles = Array.from(event.dataTransfer.files || [])
     processSelectedFiles(droppedFiles)
+  }
+
+  function handleDragOver(event) {
+    event.preventDefault()
+    setIsDragging(true)
+  }
+
+  function handleDragLeave() {
+    setIsDragging(false)
   }
 
   function processSelectedFiles(selectedFiles) {
@@ -47,11 +59,28 @@ function ResumeUploader({ onFilesChange }) {
     if (invalidNames.length > 0) {
       setValidationMessage(`Unsupported file type: ${invalidNames.join(', ')}`)
     } else {
-      setValidationMessage('')
+      setValidationMessage(validFiles.length > 0 ? `${validFiles.length} file(s) ready to upload.` : '')
     }
 
     if (typeof onFilesChange === 'function') {
       onFilesChange(validFiles)
+    }
+  }
+
+  function handleBrowseClick() {
+    inputRef.current?.click()
+  }
+
+  function handleClearFiles() {
+    setFiles([])
+    setValidationMessage('')
+
+    if (inputRef.current) {
+      inputRef.current.value = ''
+    }
+
+    if (typeof onFilesChange === 'function') {
+      onFilesChange([])
     }
   }
 
@@ -66,20 +95,46 @@ function ResumeUploader({ onFilesChange }) {
         className="hidden"
       />
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleBrowseClick}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            handleBrowseClick()
+          }
+        }}
         onDrop={handleDrop}
-        onDragOver={(event) => event.preventDefault()}
-        className="w-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-slate-400 hover:bg-slate-100"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        className={`w-full cursor-pointer rounded-xl border-2 border-dashed px-4 py-8 text-center transition sm:px-6 ${
+          isDragging
+            ? 'border-slate-900 bg-slate-100'
+            : 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'
+        }`}
       >
-        <span className="block text-sm font-medium text-slate-700">
+        <span className="block text-sm font-semibold text-slate-800">
           Drag and drop resumes here, or click to browse
         </span>
         <span className="mt-1 block text-xs text-slate-500">Supported: PDF, DOCX, JPG, JPEG, PNG</span>
-      </button>
+        <span className="mt-4 inline-flex rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
+          Choose files
+        </span>
+      </div>
 
-      <p className="mt-3 text-sm font-medium text-slate-700">Selected files: {files.length}</p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm font-medium text-slate-700">Selected files: {files.length}</p>
+        {files.length > 0 ? (
+          <button
+            type="button"
+            onClick={handleClearFiles}
+            className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+          >
+            Clear files
+          </button>
+        ) : null}
+      </div>
 
       {validationMessage ? <p className="mt-1 text-sm text-rose-600">{validationMessage}</p> : null}
 
