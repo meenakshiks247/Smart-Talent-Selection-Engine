@@ -47,15 +47,18 @@ function normalizeSkillName(skill) {
 function extractSkillsFromText(text) {
   const normalizedText = String(text ?? '').toLowerCase()
 
-  return SKILL_CATALOG.filter((skill) => {
-    const escaped = skill
-      .toLowerCase()
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      .replace(/\s+/g, '\\s+')
-      .replace(/\.js/g, '(?:\\.js|js)')
-    const pattern = new RegExp(`\\b${escaped}\\b`, 'i')
-    return pattern.test(normalizedText)
-  })
+  return SKILL_CATALOG.filter((skill) => buildSkillPattern(skill).test(normalizedText))
+}
+
+function buildSkillPattern(skill) {
+  const loweredSkill = String(skill ?? '').toLowerCase()
+
+  if (loweredSkill === 'node.js') {
+    return /(?<![\w.+-])node(?:\.js)?(?![\w.+-])/i
+  }
+
+  const escapedSkill = loweredSkill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')
+  return new RegExp(`(?<!\\w)${escapedSkill}(?!\\w)`, 'i')
 }
 
 function collectCandidateSkills(candidate) {

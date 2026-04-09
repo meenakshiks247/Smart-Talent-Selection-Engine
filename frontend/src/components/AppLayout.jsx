@@ -2,10 +2,12 @@ function AppLayout({ children, kpiItems = [], analysisStatus = 'idle', isAnalyzi
   const statusConfig = getStatusConfig(analysisStatus, isAnalyzing)
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(130deg,_#f8fafc_0%,_#f1f5f9_28%,_#eff6ff_52%,_#f8fafc_100%)]">
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-56 bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.14),_transparent_70%)]" />
+    <div className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,_#f8fbff_0%,_#eef6ff_36%,_#fbfdff_100%)]">
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_top_left,_rgba(147,197,253,0.18),_transparent_34%),radial-gradient(circle_at_85%_15%,_rgba(255,255,255,0.55),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(186,230,253,0.12),_transparent_30%)]" />
+      <div className="pointer-events-none fixed left-0 top-0 z-0 h-72 w-72 rounded-full bg-sky-200/20 blur-3xl" />
+      <div className="pointer-events-none fixed bottom-0 right-0 z-0 h-80 w-80 rounded-full bg-white/40 blur-3xl" />
 
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/70 backdrop-blur-2xl">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Smart Talent Selection Engine</p>
@@ -62,7 +64,7 @@ function AppLayout({ children, kpiItems = [], analysisStatus = 'idle', isAnalyzi
 
 function KpiCard({ title, helper, value }) {
   return (
-    <article className="rounded-3xl border border-slate-200/90 bg-white/90 p-5 shadow-sm shadow-slate-900/5 backdrop-blur sm:p-6">
+    <article className="rounded-3xl border border-white/70 bg-white/78 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{title}</p>
       <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{value}</p>
       <p className="mt-1 text-sm text-slate-600">{helper}</p>
@@ -72,7 +74,7 @@ function KpiCard({ title, helper, value }) {
 
 function SidebarItem({ title, subtitle }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
+    <div className="rounded-2xl border border-white/70 bg-white/80 px-3 py-3 shadow-sm backdrop-blur">
       <p className="text-sm font-semibold text-slate-800">{title}</p>
       <p className="text-xs text-slate-500">{subtitle}</p>
     </div>

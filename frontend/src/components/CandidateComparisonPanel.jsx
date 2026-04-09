@@ -1,5 +1,54 @@
-function CandidateComparisonPanel({ candidates = [], comparedCount = 0, onClearComparison }) {
+function CandidateComparisonPanel({
+  candidates = [],
+  comparedCount = 0,
+  hasRankedCandidates = false,
+  analysisStatus = 'idle',
+  isAnalyzing = false,
+  errorMessage = '',
+  onClearComparison,
+}) {
+  const isLoading = isAnalyzing || analysisStatus === 'loading'
+  const isError = analysisStatus === 'error'
   const readyToCompare = candidates.length >= 2
+
+  if (isLoading) {
+    return (
+      <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-sm shadow-slate-900/5 sm:p-8">
+        <div className="animate-pulse">
+          <div className="h-3 w-44 rounded bg-slate-200" />
+          <div className="mt-3 h-8 w-72 rounded bg-slate-200" />
+          <div className="mt-2 h-4 w-80 max-w-full rounded bg-slate-200" />
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <article key={`comparison-skeleton-${index}`} className="rounded-2xl border border-slate-200 bg-slate-50/75 p-4">
+                <div className="h-4 w-24 rounded bg-slate-200" />
+                <div className="mt-3 h-2 w-full rounded-full bg-slate-200" />
+                <div className="mt-4 space-y-2">
+                  <div className="h-12 rounded-xl bg-slate-100" />
+                  <div className="h-12 rounded-xl bg-slate-100" />
+                  <div className="h-12 rounded-xl bg-slate-100" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (isError) {
+    return (
+      <section className="rounded-3xl border border-rose-200 bg-white/95 p-6 shadow-sm shadow-rose-900/10 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">Candidate Comparison</p>
+        <h2 className="mt-1 text-xl font-semibold text-slate-900">Comparison unavailable</h2>
+        <p className="mt-1 text-sm text-slate-600">Run a successful analysis to enable candidate comparison again.</p>
+        <div className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {errorMessage || 'The latest API request failed.'}
+        </div>
+      </section>
+    )
+  }
 
   if (!readyToCompare) {
     return (
@@ -18,7 +67,9 @@ function CandidateComparisonPanel({ candidates = [], comparedCount = 0, onClearC
         </div>
 
         <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">
-          Select at least 2 candidates to unlock the comparison workspace.
+          {hasRankedCandidates
+            ? 'Select at least 2 candidates to unlock the comparison workspace.'
+            : 'Run analysis to populate ranked candidates before starting a side-by-side comparison.'}
         </div>
       </section>
     )

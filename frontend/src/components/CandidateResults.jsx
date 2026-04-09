@@ -23,7 +23,7 @@ function CandidateResults({
   function getScoreTone(score) {
     if (score >= 80) {
       return {
-        label: 'Excellent',
+        label: 'High',
         track: 'bg-emerald-100',
         fill: 'bg-emerald-500',
         text: 'text-emerald-700',
@@ -33,7 +33,7 @@ function CandidateResults({
 
     if (score >= 60) {
       return {
-        label: 'Strong',
+        label: 'Medium',
         track: 'bg-amber-100',
         fill: 'bg-amber-500',
         text: 'text-amber-700',
@@ -42,7 +42,7 @@ function CandidateResults({
     }
 
     return {
-      label: 'Developing',
+      label: 'Low',
       track: 'bg-rose-100',
       fill: 'bg-rose-500',
       text: 'text-rose-700',
@@ -180,10 +180,20 @@ function CandidateResults({
               <div
                 key={`${candidate?.name ?? 'candidate'}-table-${index}`}
                 className={`grid grid-cols-[58px_1.2fr_1fr_1fr_170px] gap-4 px-5 py-4 text-sm ${
-                  index === 0 ? 'bg-emerald-50/45' : 'bg-white'
+                  index === 0 ? 'bg-gradient-to-r from-emerald-50/70 via-emerald-50/35 to-white' : 'bg-white'
                 }`}
               >
-                <p className="font-semibold text-slate-700">#{index + 1}</p>
+                <div>
+                  <p className="font-semibold text-slate-700">#{index + 1}</p>
+                  {index === 0 ? (
+                    <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 ring-1 ring-emerald-200">
+                      <svg viewBox="0 0 20 20" className="h-3 w-3" fill="currentColor" aria-hidden="true">
+                        <path d="M10 1.75l2.08 4.22 4.66.68-3.37 3.28.8 4.64L10 12.37 5.83 14.57l.8-4.64L3.26 6.65l4.66-.68L10 1.75z" />
+                      </svg>
+                      Best
+                    </span>
+                  ) : null}
+                </div>
 
                 <div>
                   <p className="font-semibold text-slate-900">{candidate?.name ?? 'Unnamed Candidate'}</p>
@@ -224,10 +234,21 @@ function CandidateResults({
                 <p className="text-slate-600">{experience}</p>
 
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-base font-bold text-slate-900">{Math.round(normalizedScore)}%</p>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${scoreTone.badge}`}>
-                    {scoreTone.label}
-                  </span>
+                  <div className="w-full">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <p className="text-base font-bold text-slate-900">{Math.round(normalizedScore)}%</p>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${scoreTone.badge}`}>
+                        {scoreTone.label}
+                      </span>
+                    </div>
+                    <div className={`h-2 w-full overflow-hidden rounded-full ${scoreTone.track}`}>
+                      <div
+                        className={`h-full rounded-full ${scoreTone.fill}`}
+                        style={{ width: `${normalizedScore}%` }}
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )
@@ -279,7 +300,7 @@ function CandidateResults({
                 <div className="text-right">
                   <p className="text-lg font-bold text-slate-900">{Math.round(normalizedScore)}%</p>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${scoreTone.badge}`}>
-                    {scoreTone.label}
+                    {scoreTone.label} Score
                   </span>
                 </div>
               </div>

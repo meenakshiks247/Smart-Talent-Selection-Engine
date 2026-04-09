@@ -40,3 +40,12 @@ def test_extract_skills_does_not_match_javascript_substrings() -> None:
     text = "Worked primarily with Node.js for backend services"
 
     assert "JavaScript" not in extract_skills(text)
+
+
+def test_extract_skills_detects_standalone_js_alias_only() -> None:
+    text = "Hands-on with JS and Node.js in production APIs"
+
+    extracted = extract_skills(text)
+    assert "Node.js" in extracted
+    assert "JavaScript" in extracted
+    assert extracted.count("JavaScript") == 1

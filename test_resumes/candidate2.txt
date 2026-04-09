@@ -1,0 +1,33 @@
+RESUME - CANDIDATE 2
+
+Sarah Chen
+Full Stack Developer
+sarah.chen@email.com | github.com/sarahchen
+
+SUMMARY
+Results-oriented full-stack developer with 4 years of experience building scalable web applications. Proficient in Python backend development and React frontend architecture. Strong background in cloud deployment and DevOps practices.
+
+PROFESSIONAL EXPERIENCE
+
+Full Stack Engineer - CloudApp Solutions (2021-Present)
+- Developed fullstack applications using Python (FastAPI) and React
+- Designed and implemented REST APIs for mobile and web clients
+- Managed AWS infrastructure and database optimization
+- Implemented Docker containerization for development and production
+
+Software Developer - WebServices LLC (2019-2021)
+- Built backend services using Python and Node.js
+- Created responsive React components and UI dashboards
+- Managed PostgreSQL databases and wrote complex SQL queries
+- Collaborated on Docker deployment strategies
+
+Junior Full Stack Developer - LocalTech (2018-2019)
+- Developed Python scripts for data processing
+- Created JavaScript applications for web interfaces
+- Worked with Docker for application containerization
+
+TECHNICAL SKILLS
+Backend: Python, FastAPI, Django, Node.js, SQL
+Frontend: React, JavaScript, HTML/CSS
+Databases: PostgreSQL, MySQL
+DevOps: Docker, AWS, Git, Linux

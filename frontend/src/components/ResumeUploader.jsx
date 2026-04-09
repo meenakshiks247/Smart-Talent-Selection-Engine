@@ -56,11 +56,13 @@ function ResumeUploader({ files = [], onFilesChange, isAnalyzing = false }) {
     if (invalidNames.length > 0) {
       setValidationMessage(`Unsupported file type: ${invalidNames.join(', ')}`)
     } else {
-      setValidationMessage(validFiles.length > 0 ? `${validFiles.length} file(s) ready to upload.` : '')
+      setValidationMessage(validFiles.length > 0 ? `${validFiles.length} file(s) added to batch.` : '')
     }
 
-    if (typeof onFilesChange === 'function') {
-      onFilesChange(validFiles)
+    // Append new valid files to existing files (sequential uploads)
+    if (validFiles.length > 0 && typeof onFilesChange === 'function') {
+      const mergedFiles = [...files, ...validFiles]
+      onFilesChange(mergedFiles)
     }
   }
 
@@ -77,6 +79,14 @@ function ResumeUploader({ files = [], onFilesChange, isAnalyzing = false }) {
 
     if (typeof onFilesChange === 'function') {
       onFilesChange([])
+    }
+  }
+
+  function handleRemoveFile(indexToRemove) {
+    const updatedFiles = files.filter((_, index) => index !== indexToRemove)
+    
+    if (typeof onFilesChange === 'function') {
+      onFilesChange(updatedFiles)
     }
   }
 
@@ -149,15 +159,29 @@ function ResumeUploader({ files = [], onFilesChange, isAnalyzing = false }) {
 
       {files.length > 0 ? (
         <ul className="mt-3 space-y-2 rounded-2xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
-          {files.map((file) => (
+          {files.map((file, index) => (
             <li
               key={`${file.name}-${file.lastModified}`}
               className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2"
             >
               <span className="truncate">{file.name}</span>
-              <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-slate-500 ring-1 ring-slate-200">
-                Ready
-              </span>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-slate-500 ring-1 ring-slate-200">
+                  Ready
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFile(index)}
+                  disabled={isAnalyzing}
+                  className="text-slate-400 transition hover:text-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Remove file"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
             </li>
           ))}
         </ul>

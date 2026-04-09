@@ -1,0 +1,33 @@
+RESUME - CANDIDATE 1
+
+John Anderson
+Senior Backend Engineer
+john.anderson@email.com | linkedin.com/in/johnanderson
+
+SUMMARY
+Experienced backend engineer with 5+ years of software development experience. Expert in Python, FastAPI, and cloud deployment. Skilled in database design, API architecture, and containerization.
+
+EXPERIENCE
+
+Senior Software Engineer - TechCorp (2022-Present)
+- Architected RESTful APIs using Python and FastAPI
+- Implemented microservices with Docker and Kubernetes
+- Optimized database queries, reducing latency by 40%
+- Mentored junior developers on backend best practices
+
+Backend Engineer - DataSystems Inc (2020-2022)
+- Built data processing pipelines in Python
+- Managed PostgreSQL and MongoDB databases
+- Deployed containerized applications to AWS
+- Implemented CI/CD pipelines with GitHub Actions
+
+Junior Developer - StartupXYZ (2019-2020)
+- Developed backend services in Python and Node.js
+- Wrote SQL queries for reporting dashboards
+- Contributed to Docker containerization efforts
+
+SKILLS
+Languages: Python, JavaScript, SQL, Java
+Frameworks: FastAPI, Django, Flask, Express.js
+Databases: PostgreSQL, MySQL, MongoDB
+Tools & DevOps: Docker, Kubernetes, AWS, Git, CI/CD

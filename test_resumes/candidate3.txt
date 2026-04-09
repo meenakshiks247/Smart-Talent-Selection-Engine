@@ -1,0 +1,36 @@
+RESUME - CANDIDATE 3
+
+Michael Rodriguez
+Backend Software Engineer
+mrodriguez@email.com | linkedin.com/in/mrodriguez
+
+PROFESSIONAL SUMMARY
+Backend engineer with 6+ years of experience developing scalable APIs and microservices. Deep expertise in Python, database optimization, and cloud infrastructure. Proven track record of delivering high-performance systems.
+
+CAREER HISTORY
+
+Lead Backend Engineer - FinanceApp Corp (2022-Present)
+- Led development of Python backend services for financial platform
+- Designed Docker-based microservices architecture
+- Optimized SQL queries for million-record datasets
+- Deployed applications on AWS with Kubernetes orchestration
+- Mentored 3 junior engineers on system design
+
+Backend Engineer - DataFlow Systems (2020-2022)
+- Built Python APIs for data analytics platform
+- Implemented MongoDB and PostgreSQL database layers
+- Set up CI/CD pipelines with GitHub and Docker
+- Managed AWS infrastructure and scaling
+
+Software Engineer - TechStartup (2018-2020)
+- Developed Python and JavaScript backend services
+- Created RESTful APIs using FastAPI
+- Implemented Docker containerization
+- Wrote complex SQL queries for reporting
+
+CORE COMPETENCIES
+Languages: Python, JavaScript, Java, SQL
+Backend Frameworks: FastAPI, Django, Flask, Node.js
+Cloud & DevOps: AWS, Docker, Kubernetes, CI/CD, Git
+Databases: PostgreSQL, MySQL, MongoDB
+Architecture: Microservices, REST APIs, System Design

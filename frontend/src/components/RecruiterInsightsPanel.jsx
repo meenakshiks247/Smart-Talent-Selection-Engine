@@ -9,7 +9,17 @@ import {
   YAxis,
 } from 'recharts'
 
-function RecruiterInsightsPanel({ insights, hasCandidates = false, isAnalyzing = false, onDownloadReport }) {
+function RecruiterInsightsPanel({
+  insights,
+  hasCandidates = false,
+  isAnalyzing = false,
+  analysisStatus = 'idle',
+  errorMessage = '',
+  onDownloadReport,
+}) {
+  const isLoading = isAnalyzing || analysisStatus === 'loading'
+  const isError = analysisStatus === 'error'
+
   const summaryCards = [
     {
       title: 'Top matching skill',
@@ -39,6 +49,60 @@ function RecruiterInsightsPanel({ insights, hasCandidates = false, isAnalyzing =
 
   const hasSkillData = Array.isArray(insights?.jdSkills) && insights.jdSkills.length > 0
 
+  if (isLoading) {
+    return (
+      <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-sm shadow-slate-900/5 sm:p-8">
+        <div className="animate-pulse">
+          <div className="h-3 w-36 rounded bg-slate-200" />
+          <div className="mt-3 h-8 w-72 rounded bg-slate-200" />
+          <div className="mt-2 h-4 w-96 max-w-full rounded bg-slate-200" />
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={`insight-skeleton-${index}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="h-3 w-28 rounded bg-slate-200" />
+                <div className="mt-3 h-7 w-24 rounded bg-slate-200" />
+                <div className="mt-2 h-3 w-20 rounded bg-slate-200" />
+                <div className="mt-3 h-3 w-32 rounded bg-slate-200" />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-7 grid gap-5 xl:grid-cols-[1.25fr_1fr]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="h-4 w-52 rounded bg-slate-200" />
+              <div className="mt-2 h-3 w-64 rounded bg-slate-200" />
+              <div className="mt-5 h-64 rounded-xl bg-slate-100" />
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="h-4 w-40 rounded bg-slate-200" />
+              <div className="mt-2 h-3 w-56 rounded bg-slate-200" />
+              <div className="mt-5 space-y-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={`insight-gap-skeleton-${index}`} className="h-10 rounded-xl bg-slate-100" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (isError) {
+    return (
+      <section className="rounded-3xl border border-rose-200 bg-white/95 p-6 shadow-sm shadow-rose-900/10 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">Recruiter Insights</p>
+        <h2 className="mt-1 text-xl font-semibold text-slate-900">Insights unavailable</h2>
+        <p className="mt-1 text-sm text-slate-600">We could not generate insight cards because the latest API run failed.</p>
+        <div className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {errorMessage || 'Please retry analysis after checking backend connectivity.'}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-sm shadow-slate-900/5 sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -61,7 +125,7 @@ function RecruiterInsightsPanel({ insights, hasCandidates = false, isAnalyzing =
             <path d="M8.5 10.5 12 14l3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M5 18.5h14" strokeLinecap="round" />
           </svg>
-          Download Report (CSV)
+          Download Report
         </button>
       </div>
 
