@@ -6,6 +6,7 @@ Beginner-friendly React frontend built with Vite, functional components, and Tai
 
 - React (functional components only)
 - Vite
+- Axios
 - Tailwind CSS
 - ESLint
 
@@ -55,7 +56,10 @@ Open the printed local URL (usually `http://localhost:5173`).
 
 For quick UI testing without the backend, set `VITE_USE_MOCK_DATA=true` in a local `.env` file.
 
-The included [.env.example](.env.example) shows the default development preview setting.
+The included [.env.example](.env.example) contains live API defaults:
+
+- `VITE_API_BASE_URL=http://localhost:8000/api/v1`
+- `VITE_USE_MOCK_DATA=false`
 
 Set `VITE_USE_MOCK_DATA=false` to use the live API flow.
 
@@ -66,10 +70,12 @@ npm run build
 npm run lint
 ```
 
-## Current Starter Flow
+## Current End-to-End Flow
 
 1. Upload resume files in the upload section.
 2. Paste a job description in the input section.
-3. Click **Analyze Candidates** to preview starter ranking results.
-
-This is intentionally simple so backend API integration can be added in `src/services/apiClient.js` later.
+3. Click **Analyze Candidates** to:
+	- send files to backend bulk upload
+	- extract text and build candidate profiles
+	- call ranking API with job description + candidate profiles
+4. Review ranked candidates, recruiter insights, and comparison panel.

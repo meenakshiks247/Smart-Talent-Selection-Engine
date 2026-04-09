@@ -1,4 +1,24 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1'
+import axios from 'axios'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1'
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+})
+
+function buildApiError(error, fallbackMessage) {
+  if (axios.isAxiosError(error)) {
+    const detailMessage =
+      error?.response?.data?.detail ||
+      error?.response?.data?.message ||
+      error?.message
+
+    return new Error(detailMessage || fallbackMessage)
+  }
+
+  return new Error(fallbackMessage)
+}
 
 export async function uploadResumes(files) {
   const formData = new FormData()
@@ -7,42 +27,28 @@ export async function uploadResumes(files) {
     formData.append('files', file)
   })
 
-  const response = await fetch(`${API_BASE_URL}/resumes/bulk-upload`, {
-    method: 'POST',
-    body: formData,
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to upload resumes')
+  try {
+    const response = await apiClient.post('/resumes/bulk-upload', formData)
+    return response.data
+  } catch (error) {
+    throw buildApiError(error, 'Failed to upload resumes.')
   }
-
-  return response.json()
 }
 
 export async function createJob(payload) {
-  const response = await fetch(`${API_BASE_URL}/jobs/create`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to create job')
+  try {
+    const response = await apiClient.post('/jobs/create', payload)
+    return response.data
+  } catch (error) {
+    throw buildApiError(error, 'Failed to create job.')
   }
-
-  return response.json()
 }
 
 export async function rankCandidates(payload) {
-  const response = await fetch(`${API_BASE_URL}/rank-candidates`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to rank candidates')
+  try {
+    const response = await apiClient.post('/rank-candidates', payload)
+    return response.data
+  } catch (error) {
+    throw buildApiError(error, 'Failed to rank candidates.')
   }
-
-  return response.json()
 }
