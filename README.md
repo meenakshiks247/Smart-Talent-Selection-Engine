@@ -151,4 +151,4 @@ npm run dev
 - Add model explainability signals for ranking transparency
 - Add background processing queues for large resume batches
 
-![Project Screenshot](Screenshot(395).png)
+
