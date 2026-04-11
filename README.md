@@ -142,9 +142,13 @@ npm run dev
 - Windows: install Tesseract and add its install directory to PATH.
 - If Tesseract is unavailable, image extraction paths return safe fallback output.
 
+
+
 ## Future Improvements
 
 - Add authentication and role-based access control
 - Persist jobs and candidates in a relational database
 - Add model explainability signals for ranking transparency
 - Add background processing queues for large resume batches
+
+![Project Screenshot](Screenshot(395).png)
