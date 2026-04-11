@@ -110,6 +110,80 @@ npm run dev
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 
+## Workflow
+
+The platform supports two practical recruiter workflows:
+
+### 1) Resume Ingestion and Profile Extraction
+
+1. Recruiter uploads one or more resumes from the frontend.
+2. Frontend calls `POST /api/v1/resumes/bulk-upload`.
+3. Backend validates and stores files in `uploads/`.
+4. `text_extraction_service` extracts text from supported formats.
+5. `candidate_profile_service` derives structured fields (name, skills, experience, projects).
+6. API returns extraction status and candidate preview data for UI display.
+
+### 2) Candidate Ranking Against Job Description
+
+1. Recruiter provides a job description and candidate profiles.
+2. Frontend calls `POST /api/v1/rank-candidates`.
+3. Backend validates each candidate payload (`CandidateProfileInput`).
+4. `semantic_ranking_service` computes:
+   - semantic similarity (`semantic_matching_service`)
+   - skill match score (`skill_extraction_service` + overlap scoring)
+   - experience score (normalized years)
+5. Weighted final score is calculated and candidates are sorted descending.
+6. Top candidates may receive improved two-sentence fit summaries if `OPENAI_API_KEY` is configured.
+7. Ranked output with score breakdown is returned to the frontend.
+
+### Optional Job-Batch Workflow
+
+1. Create a job via `POST /api/v1/jobs/create`.
+2. Attach candidate profiles via `POST /api/v1/jobs/{job_id}/upload`.
+3. Review jobs and candidate pools via `GET /api/v1/jobs` and `GET /api/v1/jobs/{job_id}/candidates`.
+
+## Architecture
+
+The codebase follows a modular, layered architecture to keep API handlers thin and business logic isolated in services.
+
+```text
+Frontend (React + Vite)
+  |
+  | HTTP (Axios)
+  v
+FastAPI App (app/main.py)
+  |
+  +-- API Router (app/api/router.py)
+       |
+       +-- Health Route (app/routes/health.py)
+       +-- Resume Route (app/routes/resumes.py)
+       |     -> Resume Service
+       |        -> File Handler Utils
+       |        -> Text Extraction Service
+       |        -> Candidate Profile Service
+       |
+       +-- Ranking Route (app/routes/rank_candidates.py)
+       |     -> Semantic Ranking Service
+       |        -> Semantic Matching Service
+       |        -> Skill Extraction Service
+       |
+       +-- Jobs Route (app/routes/jobs.py)
+             -> JSON File Store (jobs_store.json)
+
+Shared Layers
+  - Pydantic Schemas (app/models/schemas.py)
+  - Utility Helpers (app/utils/*)
+  - Uploaded Files (uploads/)
+```
+
+### Architectural Principles Used
+
+- Route-first API design: endpoint modules are grouped by domain (`resumes`, `ranking`, `jobs`).
+- Service isolation: NLP/extraction/scoring logic lives in `app/services/`.
+- Schema-driven contracts: request/response validation is centralized in Pydantic models.
+- Replaceable AI components: embedding/matching/ranking services are modular for future model upgrades.
+- Frontend/backend separation: React UI communicates with FastAPI over versioned REST endpoints.
+
 ## API Endpoints
 
 - `GET /health`
